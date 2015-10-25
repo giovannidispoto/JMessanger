@@ -8,6 +8,7 @@ import org.json.simple.JSONObject;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
@@ -19,7 +20,8 @@ public class ClientThreadOut extends Thread{
     private int port;
     private Database db;
     private Socket socket;
-    private  ArrayList<ArrayList> result;
+    private ArrayList<ArrayList> result;
+    private PrintWriter out;
     private ArrayList<ArrayList> messages;
     private JSONObject jsonObj;
 
@@ -28,6 +30,11 @@ public class ClientThreadOut extends Thread{
         this.socket = socket;
         this.db = db;
         messages  = new ArrayList<ArrayList>();
+        try {
+            out = new PrintWriter(socket.getOutputStream());
+        }catch(IOException e){
+            e.printStackTrace();
+        }
         this.start();
     }
 
@@ -71,8 +78,7 @@ public class ClientThreadOut extends Thread{
                 jsonObj.put("message_sender",message_mit);
                 jsonObj.put("message",message_body);
                 socket = new Socket(clientIP,port);
-                DataOutputStream outToClient = new DataOutputStream(socket.getOutputStream());
-                outToClient.writeBytes(jsonObj.toString());
+                out.write(jsonObj.toString());
             }
         } catch (UnknownHostException e) {
             e.printStackTrace();

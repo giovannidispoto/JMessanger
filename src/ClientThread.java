@@ -6,6 +6,7 @@
  */
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
@@ -14,12 +15,13 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.*;
+import java.util.Scanner;
 
 public class ClientThread extends Thread{
 
     private Socket socket;
     private String message;
-    private BufferedReader in;
+    private Scanner in;
     private PrintWriter out;
     private Database db;
     private String regex = "^0003\\d{9}$";
@@ -33,7 +35,7 @@ public class ClientThread extends Thread{
         this.socket = socket;
         this.db = db;
         try {
-              in= new BufferedReader(new InputStreamReader(socket.getInputStream()));
+              in= new Scanner(socket.getInputStream());
               out = new PrintWriter(socket.getOutputStream());
         }catch(IOException e){
             e.printStackTrace();
@@ -46,19 +48,20 @@ public class ClientThread extends Thread{
 
     public void run() {
         while (true) {
-            try {
-                message = in.readLine();
-                message = message.trim();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+
+                if(in.hasNextLine()) {
+                    message = in.nextLine();
+                    //in.nextLine();
+                   // System.out.println(message);
+                }
+
 
             String numberM = "";
             String numberD = "";
             String chatID = "";
             String body = "";
 
-            if(message.substring(0,3).equals("conn")) {
+/*            if(message.substring(0,3).equals("conn")) {
                 numberM = message.substring(5,message.length() - 1);
                 db.setStatus(numberM,socket.getInetAddress().toString(),true);
                 continue;
@@ -68,13 +71,13 @@ public class ClientThread extends Thread{
                 numberM = message.substring(5,message.length() - 1);
                 db.setStatus(numberM,false);
                 continue;
-            }
+            }*/
 
             try {
                 objval = parser.parse(message);
                 jsonarray.add(objval);
                 obj = (JSONObject) jsonarray.get(0);
-                System.out.println(jsonarray.get(0));
+                // System.out.println(jsonarray.get(0));
 
             } catch (ParseException e) {
                 e.printStackTrace();
@@ -100,6 +103,7 @@ public class ClientThread extends Thread{
                 db.insertMessage("INSERT INTO messaggi SET c_id = ?,u_mitt = ?, u_dest = ?, messaggio = ?,inviato = ?", Integer.parseInt(chatID),Integer.parseInt(db.getUserID(numberM)),Integer.parseInt(db.getUserID(numberD)), body);
                 System.out.println("[" + chatID + "][" + numberM + "][" + numberD + "]" + body);
                 jsonarray.remove(0);
+                out.println("OK");
 
             } catch (Exception e) {
                 System.out.println(e.getMessage());
