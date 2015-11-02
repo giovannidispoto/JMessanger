@@ -61,20 +61,10 @@ public class ClientThread extends Thread{
             String chatID = "";
             String body = "";
 
-/*            if(message.substring(0,3).equals("conn")) {
-                numberM = message.substring(5,message.length() - 1);
-                db.setStatus(numberM,socket.getInetAddress().toString(),true);
-                continue;
-            }
 
-            if(message.substring(0,3).equals("disc")) {
-                numberM = message.substring(5,message.length() - 1);
-                db.setStatus(numberM,false);
-                continue;
-            }*/
 
             try {
-                objval = parser.parse(message);
+                objval = parser.parse(message.substring(1,message.length()));
                 jsonarray.add(objval);
                 obj = (JSONObject) jsonarray.get(0);
                 // System.out.println(jsonarray.get(0));
@@ -84,30 +74,53 @@ public class ClientThread extends Thread{
                 continue;
             }
 
+            switch(message.charAt(0)){
+                case 'M':
+                    numberM = (String) obj.get("numeroM");
+                    numberD = (String) obj.get("numeroD");
+                    chatID = (String) obj.get("chatID");
+                    body = (String) obj.get("body");
 
-            numberM = (String) obj.get("numeroM");
-            numberD = (String) obj.get("numeroD");
-            chatID = (String) obj.get("chatID");
-            body = (String) obj.get("body");
+                    System.out.println(numberM);
+                    System.out.println(numberD);
+                    System.out.println(chatID);
+                    System.out.println(body);
 
-            System.out.println(numberM);
-            System.out.println(numberD);
-            System.out.println(chatID);
-            System.out.println(body);
+                    try {
+                        if (!numberM.matches(regex) || !numberD.matches(regex)) throw new Exception("[-] Numero Mancante");
 
-            try {
-                if (!numberM.matches(regex) || !numberD.matches(regex)) throw new Exception("[-] Numero Mancante");
+                        if(db.getUserID(numberD).equals("null") || db.getUserID(numberM).equals("null")) throw new Exception("[-] Utente non esistente");
 
-                if(db.getUserID(numberD).equals("null") || db.getUserID(numberM).equals("null")) throw new Exception("[-] Utente non esistente");
+                        db.insertMessage("INSERT INTO messaggi SET c_id = ?,u_mitt = ?, u_dest = ?, messaggio = ?,inviato = ?", Integer.parseInt(chatID),Integer.parseInt(db.getUserID(numberM)),Integer.parseInt(db.getUserID(numberD)), body);
+                        System.out.println("[" + chatID + "][" + numberM + "][" + numberD + "]" + body);
+                        jsonarray.remove(0);
+                        out.println("OK");
 
-                db.insertMessage("INSERT INTO messaggi SET c_id = ?,u_mitt = ?, u_dest = ?, messaggio = ?,inviato = ?", Integer.parseInt(chatID),Integer.parseInt(db.getUserID(numberM)),Integer.parseInt(db.getUserID(numberD)), body);
-                System.out.println("[" + chatID + "][" + numberM + "][" + numberD + "]" + body);
-                jsonarray.remove(0);
-                out.println("OK");
+                    } catch (Exception e) {
+                        System.out.println(e.getMessage());
+                    }
+                            break;
+                case 'S':
+                        String number = (String) obj.get("numero");
+                        String status = (String) obj.get("Change Status");
+                    try {
+                        if (!numberM.matches(regex) || !numberD.matches(regex)) throw new Exception("[-] Numero Mancante");
 
-            } catch (Exception e) {
-                System.out.println(e.getMessage());
+                        if(db.getUserID(number).equals("null")) throw new Exception("[-] Utente non esistente");
+
+                        if(status.equalsIgnoreCase("Connect")) db.setStatus(number, socket.getInetAddress().toString(),true);
+                        else db.setStatus(number,false);
+
+                        System.out.println("[" + chatID + "][" + numberM + "][" + numberD + "]" + body);
+                        jsonarray.remove(0);
+                        out.println("OK");
+
+                    } catch (Exception e) {
+                        System.out.println(e.getMessage());
+                    }
+                            break;
             }
+
         }
     }
 
