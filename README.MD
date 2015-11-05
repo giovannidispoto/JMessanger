@@ -1,2 +1,1 @@
-JMessanger Server
-Alpha Version 0.01
+JMessanger Server  0.01 (Alpha Version)
