@@ -28,8 +28,8 @@ CREATE TABLE  'chat' (
   'u_primo' int(11) NOT NULL,
   'u_secondo' int(11) NOT NULL,
   PRIMARY KEY ('c_id'),
-  FOREIGN KEY('u_primo') references 'users'('id'),
-  FOREIGN KEY('u_secondo') references 'users'('id')
+  FOREIGN KEY('u_primo') references 'users'('u_id'),
+  FOREIGN KEY('u_secondo') references 'users'('u_id')
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
@@ -45,9 +45,9 @@ CREATE TABLE 'messaggi' (
   'messaggio' varchar(255) DEFAULT NULL,
   'inviato' tinyint(1) NOT NULL,
   PRIMARY KEY ('m_id'),
-  FOREIGN KEY('c_id') references 'chat'('id'),
-  FOREIGN KEY('u_mit') references 'users'('id'),
-  FOREIGN KEY('u_dest') references 'users'('id')
+  FOREIGN KEY('c_id') references 'chat'('c_id'),
+  FOREIGN KEY('u_mit') references 'users'('u_id'),
+  FOREIGN KEY('u_dest') references 'users'('u_id')
 
 
 
@@ -69,7 +69,7 @@ UNLOCK TABLES;
 
 
 CREATE TABLE 'users' (
-  'id' int(11) NOT NULL AUTO_INCREMENT,
+  'u_id' int(11) NOT NULL AUTO_INCREMENT,
   'nome' varchar(50) DEFAULT NULL,
   'numero' varchar(13) DEFAULT NULL,
   'ip' varchar(12) DEFAULT NULL,
@@ -81,7 +81,7 @@ CREATE TABLE 'users' (
 LOCK TABLES 'users' WRITE;
 /*!40000 ALTER TABLE 'users' DISABLE KEYS */;
 
-INSERT INTO 'users' ('id', 'nome', 'numero', 'ip', 'macaddress', 'attivo')
+INSERT INTO 'users' ('u_id', 'nome', 'numero', 'ip', 'macaddress', 'attivo')
 VALUES
   (1,'Giovanni Dispoto','0003318669067','0.0.0.0','48-2C-6A-1E-59-3D',1),
   (3,'Giuseppe Dispoto','0003477831234','0.0.0.0','48-2C-6A-1E-59-3D',1);

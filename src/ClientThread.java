@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.*;
+import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 public class ClientThread extends Thread{
@@ -30,6 +31,7 @@ public class ClientThread extends Thread{
     private JSONObject obj;
     private Object objval;
     private ClientThreadOut threadOut;
+    private boolean stop = false;
 
     public ClientThread(Socket socket,Database db){
         this.socket = socket;
@@ -42,19 +44,25 @@ public class ClientThread extends Thread{
         }
         parser = new JSONParser();
         jsonarray = new JSONArray();
-        threadOut = new ClientThreadOut(socket,db);
+
         this.start();
     }
 
     public void run() {
-        while (true) {
-
-                if(in.hasNextLine()) {
-                    message = in.nextLine();
-                    //in.nextLine();
-                   // System.out.println(message);
-                }
-
+        while (!stop) {
+            System.out.println("p");
+            try {
+                socket.setSoTimeout(60000);
+                message = in.nextLine();
+            }catch(NoSuchElementException e){
+                System.out.println("Chiusura Socket input");
+                stop = true;
+                continue;
+            }catch(SocketException e){
+                System.out.println("Chiusura Socket input");
+                stop = true;
+                continue;
+            }
 
             String numberM = "";
             String numberD = "";
@@ -64,7 +72,7 @@ public class ClientThread extends Thread{
 
 
             try {
-                objval = parser.parse(message.substring(1,message.length()));
+                objval = parser.parse(message);
                 jsonarray.add(objval);
                 obj = (JSONObject) jsonarray.get(0);
                 // System.out.println(jsonarray.get(0));
@@ -74,8 +82,8 @@ public class ClientThread extends Thread{
                 continue;
             }
 
-            switch(message.charAt(0)){
-                case 'M':
+            switch((String) obj.get("action")){
+                case "message":
                     numberM = (String) obj.get("numeroM");
                     numberD = (String) obj.get("numeroD");
                     chatID = (String) obj.get("chatID");
@@ -94,31 +102,45 @@ public class ClientThread extends Thread{
                         db.insertMessage("INSERT INTO messaggi SET c_id = ?,u_mitt = ?, u_dest = ?, messaggio = ?,inviato = ?", Integer.parseInt(chatID),Integer.parseInt(db.getUserID(numberM)),Integer.parseInt(db.getUserID(numberD)), body);
                         System.out.println("[" + chatID + "][" + numberM + "][" + numberD + "]" + body);
                         jsonarray.remove(0);
-                        out.println("OK");
+
 
                     } catch (Exception e) {
                         System.out.println(e.getMessage());
                     }
                             break;
-                case 'S':
+                case "status":
                         String number = (String) obj.get("numero");
-                        String status = (String) obj.get("Change Status");
+                        String status = (String) obj.get("stato");
                     try {
-                        if (!numberM.matches(regex) || !numberD.matches(regex)) throw new Exception("[-] Numero Mancante");
+                        if (!number.matches(regex) || !number.matches(regex)) throw new Exception("[-] Numero Mancante");
 
                         if(db.getUserID(number).equals("null")) throw new Exception("[-] Utente non esistente");
 
                         if(status.equalsIgnoreCase("Connect")) db.setStatus(number, socket.getInetAddress().toString(),true);
                         else db.setStatus(number,false);
 
-                        System.out.println("[" + chatID + "][" + numberM + "][" + numberD + "]" + body);
+                        System.out.println("["+number+"]"+"Status:"+status);
                         jsonarray.remove(0);
-                        out.println("OK");
+
 
                     } catch (Exception e) {
                         System.out.println(e.getMessage());
                     }
+                    if(status.equalsIgnoreCase("Connect")) threadOut = new ClientThreadOut(socket,db,number);
+                    else if(status.equalsIgnoreCase("Disconnect")){
+                        threadOut.requestStop();
+                        stop = true;
+                    }
                             break;
+                case "getPhoto":
+                    String numbers = (String) obj.get("numeri");
+                    String numbers_array[] = numbers.split(";");
+
+                    boolean b = threadOut.sendPhoto(numbers_array);
+
+                    System.out.println(b);
+
+                    break;
             }
 
         }

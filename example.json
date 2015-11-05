@@ -1,0 +1,8 @@
+{"action":"status","numero":"0003318669067","stato":"connect"}
+{"action":"getPhoto","numeri":"0003318669067;"}
+{
+"numeroM": "0003318669067",
+"numeroD": "0003477831234",
+"chatID" : "1",
+"body" : "Questo è un messaggio inviato tramite JSON"
+}

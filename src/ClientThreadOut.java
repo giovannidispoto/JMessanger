@@ -18,7 +18,9 @@ import java.util.ArrayList;
 public class ClientThreadOut extends Thread{
 
     private int port;
+    private boolean stop = false;
     private Database db;
+    private String ip,number;
     private Socket socket;
     private ArrayList<ArrayList> result;
     private PrintWriter out;
@@ -26,9 +28,11 @@ public class ClientThreadOut extends Thread{
     private JSONObject jsonObj;
 
 
-    public ClientThreadOut(Socket socket, Database db){
+    public ClientThreadOut(Socket socket, Database db,String number){
         this.socket = socket;
         this.db = db;
+        this.ip = socket.getInetAddress().toString();
+        this.number = number;
         messages  = new ArrayList<ArrayList>();
         try {
             out = new PrintWriter(socket.getOutputStream());
@@ -40,50 +44,61 @@ public class ClientThreadOut extends Thread{
 
     public void run(){
 
-        while(true){
-            result = db.getActiveIP();
+        while(!stop){
+            /*result = db.getActiveIP();
             ArrayList<String> id  = result.get(0);
             ArrayList<String> ip = result.get(1);
-            ArrayList<String> number = result.get(2);
+            ArrayList<String> number = result.get(2);*/
 
             messages = null;
-            for(int i = 0; i < id.size(); i++){
+            // for(int i = 0; i < id.size(); i++){
                 //System.out.println("Id active: " + id.get(i)+", IP:"+ip.get(i));
-                messages = db.getMessages(number.get(i));
+                messages = db.getMessages(number);
 
-                ArrayList<Integer> messages_id = messages.get(0); //id destinazione
-                ArrayList<String> messages_mess = messages.get(1);
-                ArrayList<String> message_mitt = messages.get(2);
-                if(messages_id.size() == 0) break;
-                send(messages_id, messages_mess, message_mitt,ip.get(i));
-            }
+            //ArrayList<Integer> messages_id = messages.get(0); //id destinazione
+            ArrayList<String> messages_mess = messages.get(0);
+            ArrayList<String> messages_mitt = messages.get(1);
+            send( messages_mess, messages_mitt, ip);
+
+           // }
         }
 
     }
 
-    public void send(ArrayList<Integer> messages_id, ArrayList<String> messages_mess,ArrayList<String> message_mitt, String ip) {
+    public void requestStop(){
+        stop = true;
+    }
+
+    public void send( ArrayList<String> messages_mess,ArrayList<String> messages_mitt, String ip) {
 
         int id;
         String message_body,message,message_mit;
-        try {
-            InetAddress clientIP = InetAddress.getByName(ip);
 
 
-            for(int i = 0; i < messages.size(); i++) {
 
-                id = messages_id.get(i);
+        for(int i = 0; i < messages_mess.size(); i++) {
+
+               // id = messages_id.get(i);
                 jsonObj = new JSONObject();
                 message_body = messages_mess.get(i);
-                message_mit = message_mitt.get(i);
+                message_mit = messages_mitt.get(i);
                 jsonObj.put("message_sender",message_mit);
                 jsonObj.put("message",message_body);
-                socket = new Socket(clientIP,port);
                 out.write(jsonObj.toString());
             }
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+
+    }
+
+    public boolean sendPhoto(String numbers[]){
+        for(int i = 0;i< numbers.length;i++){
+            JSONObject jsonObja = new JSONObject();
+            jsonObja.put("numberPhotoProfile",numbers[i]);
+            jsonObja.put("photo",db.getPhoto(numbers[i]));
+            System.out.println(jsonObja.toJSONString());
+            return true;
+
         }
+
+        return false;
     }
 }
