@@ -4,7 +4,8 @@
  * @description: Questa classe si occupa di creare utenti, messaggi e tutto ciò che riguarda la gestione del database
  *
  * TODO: Iniziare a progettare ricezione propic e controllo numeri contatti se presenti nell'app
- * TODO: Vedere invio propic tramite Stream
+ * TODO: Vedere invio foto tramite pacchetto HTTP
+ * TODO: Scrivere script livello server PHP
  */
 import sun.misc.IOUtils;
 import sun.nio.ch.IOUtil;

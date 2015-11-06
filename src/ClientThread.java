@@ -50,7 +50,6 @@ public class ClientThread extends Thread{
 
     public void run() {
         while (!stop) {
-            System.out.println("p");
             try {
                 socket.setSoTimeout(60000);
                 message = in.nextLine();
