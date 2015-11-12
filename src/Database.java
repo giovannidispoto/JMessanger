@@ -3,7 +3,6 @@
  * @author: Giovanni Dispoto
  * @description: Questa classe si occupa di creare utenti, messaggi e tutto ciò che riguarda la gestione del database
  *
- * TODO: Iniziare a progettare ricezione propic e controllo numeri contatti se presenti nell'app
  * TODO: Vedere invio foto tramite pacchetto HTTP
  * TODO: Scrivere script livello server PHP
  */
@@ -206,39 +205,21 @@ public class Database {
 
     }
 
-    public byte[] getPhoto(String number){
-       Blob b = null; InputStream image = null;byte[] photo;
-        System.out.println(Integer.parseInt(getUserID(number)));
+    synchronized String getPhotoFile(String number){
         try{
-            stmt = conn.prepareStatement("SELECT photo FROM users WHERE id = ?");
-            stmt.setInt(1,Integer.parseInt(getUserID(number)));
 
+            stmt = conn.prepareStatement("SELECT nome_file_foto from Users WHERE numero = ?");
+            stmt.setString(1,number);
             rs = stmt.executeQuery();
-            while (rs.next()) {
-               image  = rs.getBinaryStream(1);
+
+            while(rs.next()){
+                return rs.getString("nome_file_foto");
             }
-
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-
-            byte buffer[] = new byte[3000000];
-            int read = 0;
-            try{
-            OutputStream fout =new FileOutputStream("/Users/giovannidispoto/Desktop/photo.jpg");
-
-                while((read = image.read(buffer,0,buffer.length)) != -1){
-                    fout.write(buffer);
-                }
-
-
-            fout.close();
-            }catch(IOException e){
-                e.printStackTrace();
-            }
-            return null;
-        } catch (SQLException e) {
+        }catch(SQLException e){
             e.printStackTrace();
-    }
-        return null;
+        }
+
+        return "standard_photo";
     }
 
 }

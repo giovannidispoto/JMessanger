@@ -1,9 +1,4 @@
 {"action":"status","numero":"0003318669067","stato":"connect"} //JSON for Connection
 {"action":"getPhoto","numeri":"0003318669067;"} //JSON for getting photo
-{ //JSON for sending Messages
-"action":"message",
-"numeroM": "0003318669067",
-"numeroD": "0003477831234",
-"chatID" : "1",
-"body" : "Questo è un messaggio inviato tramite JSON"
-}
+{"action":"message","numeroM": "0003318669067","numeroD": "0003477831234","chatID" : "1", "body" : "Test123"}
+//JSON for sending Messages

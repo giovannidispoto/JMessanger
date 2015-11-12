@@ -93,7 +93,7 @@ public class ClientThreadOut extends Thread{
         for(int i = 0;i< numbers.length;i++){
             JSONObject jsonObja = new JSONObject();
             jsonObja.put("numberPhotoProfile",numbers[i]);
-            jsonObja.put("photo",db.getPhoto(numbers[i]));
+            jsonObja.put("photo",db.getPhotoFile(numbers[i]));
             System.out.println(jsonObja.toJSONString());
             return true;
 
