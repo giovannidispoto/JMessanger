@@ -16,7 +16,7 @@
     if(isset($photo_p) && file_exists($photo_p)){
        echo "<img src='".$photo_p."' name='photo'/>";
   }else{
-    echo "File Not Found On Server\n".$photo_;
+    echo "File Not Found On Server";
   }
   ?>
 </body>
