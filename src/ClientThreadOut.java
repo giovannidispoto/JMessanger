@@ -43,22 +43,18 @@ public class ClientThreadOut extends Thread{
     }
 
     public void run(){
+        System.out.println("[+] Thread in output avviato");
 
         while(!stop){
-            /*result = db.getActiveIP();
-            ArrayList<String> id  = result.get(0);
-            ArrayList<String> ip = result.get(1);
-            ArrayList<String> number = result.get(2);*/
 
-            messages = null;
-            // for(int i = 0; i < id.size(); i++){
-                //System.out.println("Id active: " + id.get(i)+", IP:"+ip.get(i));
+                messages = null;
                 messages = db.getMessages(number);
 
             //ArrayList<Integer> messages_id = messages.get(0); //id destinazione
             ArrayList<String> messages_mess = messages.get(0);
             ArrayList<String> messages_mitt = messages.get(1);
-            send( messages_mess, messages_mitt, ip);
+            System.out.println(messages_mess+"\n"+messages_mitt);
+            send( messages_mess, messages_mitt, "localhost");
 
            // }
         }
@@ -81,7 +77,7 @@ public class ClientThreadOut extends Thread{
                // id = messages_id.get(i);
                 jsonObj = new JSONObject();
                 message_body = messages_mess.get(i);
-                message_mit = messages_mitt.get(i);
+                message_mit = String.valueOf(messages_mitt.get(i));
                 jsonObj.put("message_sender",message_mit);
                 jsonObj.put("message",message_body);
                 out.write(jsonObj.toString());

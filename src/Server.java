@@ -3,8 +3,8 @@
  * @author: Giovanni Dispoto
  * @description: Questo Thread si occupa di rievere le richieste di connessione e di creare un thread per ogni connessione richiesta
  *
- * TODO: Controllare BUG scrittura su DB a volte si e volte no per problema Utenza non esistente
  *
+ *TODO: Controllare invio messaggi al client.
  *
  * {
  *     "numeroM":"00102902",

@@ -88,10 +88,10 @@ public class ClientThread extends Thread{
                     chatID = (String) obj.get("chatID");
                     body = (String) obj.get("body");
 
-                    System.out.println(numberM);
+                    /*System.out.println(numberM);
                     System.out.println(numberD);
                     System.out.println(chatID);
-                    System.out.println(body);
+                    System.out.println(body);*/
 
                     try {
                         if (!numberM.matches(regex) || !numberD.matches(regex)) throw new Exception("[-] Numero Mancante");
